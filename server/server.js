@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 
 var {mongoose} = require('./db/mongoose');
 var {Nearby} = require('./models/nearby');
+var {Society} = require('./models/society');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 require('./config/config.js')
@@ -114,6 +115,110 @@ app.patch('/nearby/:id', authenticate, (req,res) => {
       return res.status(400).send()
     }
     res.send({nearby});
+  }).catch((e) => {
+    res.status(400).send()
+  })
+});
+
+// ---------------------------------------------------------------
+
+app.post('/society', authenticate, (req, res) => {
+  var society = new Society({
+    name: req.body.name,
+    dist: req.body.dist,
+    type: req.body.type,
+    desc: req.body.desc,
+    link: req.body.link,
+    _creator: req.user._id
+  });
+
+  society.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e)
+  }).catch((e) => {
+    console.log(e)
+  });
+});
+
+// ---------------------------------------------------------------
+
+app.get('/society', (req,res) => {
+  Society.find().then((society) =>{
+    res.send({society})
+  },(e) => {
+    res.status(400).send(e);
+  }).catch((e) => {
+    console.log(e);
+  });
+});
+
+// ---------------------------------------------------------------
+
+app.get('/society/:id', (req,res) => {
+  var id = req.params.id;
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send();
+
+  }
+  Society.findOne({
+    _id:id,
+  }).then((society)=> {
+    if(!society) {
+      return res.status(404).send()
+    }
+
+    res.send({society});
+  }).catch((e) =>{
+    res.status(400).send();
+  });
+});
+
+// ---------------------------------------------------------------
+
+app.delete('/society/:id', authenticate, (req,res) => {
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+  Society.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then((society) => {
+    if(!society) {
+      return res.status(400).send()
+    }
+
+    res.send({society});
+  }).catch((e) =>{
+    res.status(400).send();
+  });
+})
+
+// ---------------------------------------------------------------
+
+app.patch('/society/:id', authenticate, (req,res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ['name', 'dist', 'type', 'desc', 'link']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+    body.name = req.body.name
+    body.dist = req.body.dist
+    body.type = req.body.type
+    body.desc = req.body.desc
+    body.link = req.body.link
+
+  Society.findOneAndUpdate({
+    _id:id,
+    _creator: req.user.id
+  }, {$set: body}, {new: true}).then((society) => {
+    if(!society) {
+      return res.status(400).send()
+    }
+    res.send({society});
   }).catch((e) => {
     res.status(400).send()
   })
