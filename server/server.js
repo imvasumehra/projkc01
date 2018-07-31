@@ -15,23 +15,9 @@ const _ = require('lodash');
 
 var app = express();
 
-const argv = yargs
- .options({
-   p: {
-
-     alias: 'PORT',
-     describe: 'Port to run on',
-   }
- })
- .help()
- .alias('help', 'h')
- .argv;
-
-process.env.PORT = argv.p || 3000
-
 const port = process.env.PORT
 
-console.log(process.env)
+//console.log(process.env)
 
 app.use(bodyParser.json());
 // ---------------------------------------------------------------
@@ -111,11 +97,11 @@ app.get('/nearby/:id', (req,res) => {
 });
 
 // ---------------------------------------------------------------
-app.get('/mapdata/:id', (req,res) => {
-  var id = req.params.id;
+app.get('/mapdata/:index', (req,res) => {
+  var index = req.params.index;
 
   MapData.findOne({
-    _id:id,
+    index:index,
   }).then((map)=> {
     if(!map) {
       return res.status(404).send()
