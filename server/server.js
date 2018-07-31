@@ -15,6 +15,14 @@ const _ = require('lodash');
 
 var app = express();
 
+app.use(function (req, res, next) {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Expose-Headers', 'x-auth');
+    res.setHeader('Access-Control-Allow-Headers','Origin, X-Requested-With,content-type, Accept');
+    next();
+});
+
 const port = process.env.PORT
 
 //console.log(process.env)
