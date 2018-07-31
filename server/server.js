@@ -76,6 +76,23 @@ app.get('/nearby', (req,res) => {
 
 // ---------------------------------------------------------------
 
+app.get('/mapdata', (req,res) => {
+  MapData.find().then((mapdata) =>{
+    var items = [];
+    mapdata.forEach(function(item){
+      items.push(item);
+    });
+    res.send(items);
+    console.log(items);
+  },(e) => {
+    res.status(400).send(e);
+  }).catch((e) => {
+    console.log(e);
+  });
+});
+
+// ---------------------------------------------------------------
+
 app.get('/nearby/:id', (req,res) => {
   var id = req.params.id;
 
