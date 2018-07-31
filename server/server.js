@@ -1,10 +1,12 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var yargs = require('yargs');
 
 var {mongoose} = require('./db/mongoose');
 var {Nearby} = require('./models/nearby');
 var {Society} = require('./models/society');
 var {User} = require('./models/user');
+var {MapData} = require('./models/MapData');
 var {authenticate} = require('./middleware/authenticate');
 require('./config/config.js')
 
@@ -13,7 +15,23 @@ const _ = require('lodash');
 
 var app = express();
 
-const port = process.env.PORT || 3000
+const argv = yargs
+ .options({
+   p: {
+
+     alias: 'PORT',
+     describe: 'Port to run on',
+   }
+ })
+ .help()
+ .alias('help', 'h')
+ .argv;
+
+process.env.PORT = argv.p || 3000
+
+const port = process.env.PORT
+
+console.log(process.env)
 
 app.use(bodyParser.json());
 // ---------------------------------------------------------------
@@ -38,10 +56,31 @@ app.post('/nearby', authenticate, (req, res) => {
 });
 
 // ---------------------------------------------------------------
+app.post('/mapdata', authenticate, (req, res) => {
+  var map = new MapData({
+    title: req.body.title,
+    index: req.body.index,
+    _creator: req.user._id
+  });
+
+  map.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e)
+  }).catch((e) => {
+    console.log(e)
+  });
+});
+// ---------------------------------------------------------------
 
 app.get('/nearby', (req,res) => {
   Nearby.find().then((nearby) =>{
-    res.send({nearby})
+    var items = [];
+    nearby.forEach(function(item){
+      items.push(item);
+    });
+    res.send(items);
+    console.log(items);
   },(e) => {
     res.status(400).send(e);
   }).catch((e) => {
@@ -72,6 +111,24 @@ app.get('/nearby/:id', (req,res) => {
 });
 
 // ---------------------------------------------------------------
+app.get('/mapdata/:id', (req,res) => {
+  var id = req.params.id;
+
+  MapData.findOne({
+    _id:id,
+  }).then((map)=> {
+    if(!map) {
+      return res.status(404).send()
+    }
+
+    res.send({map});
+  }).catch((e) =>{
+    res.status(400).send();
+  });
+});
+
+// ---------------------------------------------------------------
+
 
 app.delete('/nearby/:id', authenticate, (req,res) => {
   var id = req.params.id;
@@ -242,6 +299,8 @@ app.post('/users', (req,res) => {
 
 // ---------------------------------------------------------------
 
+
+
 app.get('/users/me', authenticate, (req,res) => {
   res.send(req.user);
 });
@@ -269,6 +328,8 @@ app.delete('/users/me/token', authenticate, (req,res) => {
 });
 
 // ---------------------------------------------------------------
+
+
 
 app.listen(port, () => {
   console.log(`Started ${port}`);
