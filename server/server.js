@@ -6,7 +6,7 @@ var {mongoose} = require('./db/mongoose');
 var {Nearby} = require('./models/nearby');
 var {Society} = require('./models/society');
 var {User} = require('./models/user');
-var {MapData} = require('./models/MapData');
+var {MapData} = require('./models/mapdata');
 var {authenticate} = require('./middleware/authenticate');
 require('./config/config.js')
 
