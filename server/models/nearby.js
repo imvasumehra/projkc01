@@ -23,7 +23,11 @@ var Nearby = mongoose.model('Nearby', {
   },
   link: {
     type: String,
-    required: true,
+    required: true
+  },
+  expense: {
+    type: Number,
+    required: true
   },
   _creator: {
     required: true,

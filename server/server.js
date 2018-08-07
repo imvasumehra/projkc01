@@ -37,6 +37,7 @@ app.post('/nearby', authenticate, (req, res) => {
     type: req.body.type,
     desc: req.body.desc,
     link: req.body.link,
+    expense: req.body.expense,
     _creator: req.user._id
   });
 
@@ -50,10 +51,12 @@ app.post('/nearby', authenticate, (req, res) => {
 });
 
 // ---------------------------------------------------------------
-app.post('/mapdata', authenticate, (req, res) => {
+app.post('/mapdata', authenticate,  (req, res) => {
   var map = new MapData({
     title: req.body.title,
     index: req.body.index,
+    tooltipDesc: req.body.tooltipDesc,
+    desc: req.body.desc,
     _creator: req.user._id
   });
 
@@ -174,6 +177,7 @@ app.patch('/nearby/:id', authenticate, (req,res) => {
     body.type = req.body.type
     body.desc = req.body.desc
     body.link = req.body.link
+    body.expense = req.body.expense
 
   Nearby.findOneAndUpdate({
     _id:id,
