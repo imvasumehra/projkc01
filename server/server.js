@@ -167,7 +167,7 @@ app.delete('/nearby/:id', authenticate, (req,res) => {
 
 app.patch('/nearby/:id', authenticate, (req,res) => {
   var id = req.params.id;
-  var body = _.pick(req.body, ['name', 'dist', 'type', 'desc', 'link']);
+  var body = _.pick(req.body, ['name', 'dist', 'type', 'desc', 'link', 'expense']);
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
